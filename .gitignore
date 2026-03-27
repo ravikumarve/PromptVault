@@ -1,1 +1,2 @@
 frontend/node_modules\nbackend/venv\n*.db\n.env\n__pycache__\n.next
+frontend/
