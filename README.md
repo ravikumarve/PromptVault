@@ -2,18 +2,58 @@
 
 Git for AI Prompts - Version control, collaboration, and testing for your prompt engineering workflow.
 
-## Overview
+## 🚀 Current Status
 
-PromptVault is a SaaS platform that brings Git-like version control to AI prompt engineering. Track changes, collaborate with teams, and test prompts across different models - all in one place.
+**Last Updated: March 31, 2026**
 
-## Features
+### ✅ Completed Features
 
-- **Version Control**: Track changes, revert to previous versions, and maintain complete history
-- **Team Collaboration**: Share prompts and maintain consistency across AI applications
-- **Model Testing**: Test prompts across different AI models and track performance
-- **Modern Stack**: Next.js 16 frontend with FastAPI backend and SQLite database
+**Core Infrastructure:**
+- ✅ **Authentication System**: Full JWT-based auth with registration, login, logout
+- ✅ **Database Setup**: SQLite with SQLAlchemy ORM, user models, migrations ready
+- ✅ **Backend API**: FastAPI backend with health checks and OpenAPI docs
+- ✅ **Frontend Foundation**: Next.js 16.2.1 with TypeScript and Tailwind CSS 4
+- ✅ **UI Design System**: Complete auth pages (login/register) with responsive design
 
-## Tech Stack
+**What Actually Works:**
+- User registration and login (`POST /api/auth/register`, `POST /api/auth/login`)
+- JWT token generation and validation
+- Database persistence for user accounts
+- Health check endpoint (`GET /api/health`)
+- Complete authentication flow in frontend
+- Responsive login/register UI
+
+### ⚠️ Current Limitations
+- Frontend development server not running (needs `npm run dev`)
+- Prompt management endpoints return 501 Not Implemented
+- Dashboard and main app interface not built yet
+- No prompt versioning functionality implemented
+- No AI model integrations yet
+
+## 📋 Roadmap
+
+### Phase 1: Core MVP (Current Focus)
+- [x] **Authentication System** - User registration/login with JWT
+- [x] **Database Schema** - User models and migrations
+- [x] **Backend Foundation** - FastAPI setup with health checks
+- [x] **Frontend Setup** - Next.js with TypeScript and Tailwind
+- [ ] **Prompt CRUD** - Create, read, update, delete prompts
+- [ ] **Version Control** - Git-like versioning for prompts
+- [ ] **Dashboard UI** - Main application interface
+
+### Phase 2: Collaboration Features
+- [ ] Team management and sharing
+- [ ] Prompt diff visualization
+- [ ] Comment and review system
+- [ ] Access control and permissions
+
+### Phase 3: Advanced Features
+- [ ] AI model integrations (OpenAI, Anthropic, etc.)
+- [ ] Prompt performance analytics
+- [ ] Template system and prompt sharing
+- [ ] CLI tool for local prompt management
+
+## 🛠️ Tech Stack
 
 ### Frontend
 - **Framework**: Next.js 16.2.1 with App Router
@@ -22,15 +62,16 @@ PromptVault is a SaaS platform that brings Git-like version control to AI prompt
 - **UI**: Radix UI, Lucide React icons
 
 ### Backend
-- **Framework**: FastAPI
-- **Database**: SQLite with SQLAlchemy ORM
-- **Authentication**: JWT-based auth system
+- **Framework**: FastAPI 0.104.1
+- **Database**: SQLite with SQLAlchemy 2.0 ORM
+- **Authentication**: JWT with Python-JOSE
 - **API**: RESTful API with OpenAPI documentation
+- **Migrations**: Alembic for database versioning
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
+- Node.js 18+
 - Python 3.12+
 - Git
 
@@ -56,19 +97,26 @@ PromptVault is a SaaS platform that brings Git-like version control to AI prompt
 
 4. **Set up environment variables**
    ```bash
-   # Backend (.env)
+   # Copy and customize the example file
+   cp .env.example .env
+   ```
+   
+   Edit `.env` with your settings:
+   ```bash
    DATABASE_URL=sqlite:///./promptvault.db
-   SECRET_KEY=your-secret-key-here
-   CORS_ORIGINS=http://localhost:3000
+   SECRET_KEY=your-super-secret-key-here-change-in-production
+   ALGORITHM=HS256
+   ACCESS_TOKEN_EXPIRE_MINUTES=10080
+   CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
    ```
 
 5. **Run the development servers**
    ```bash
-   # Terminal 1 - Backend
+   # Terminal 1 - Backend (port 8000)
    cd backend
    uvicorn app.main:app --reload
    
-   # Terminal 2 - Frontend  
+   # Terminal 2 - Frontend (port 3000)
    cd frontend
    npm run dev
    ```
@@ -77,69 +125,63 @@ PromptVault is a SaaS platform that brings Git-like version control to AI prompt
    - Frontend: http://localhost:3000
    - API Docs: http://localhost:8000/api/docs
 
-## Project Structure
+## 🗂️ Project Structure
 
 ```
 promptvault/
 ├── frontend/                 # Next.js frontend
-│   ├── src/app/             # App Router pages
-│   │   ├── (app)/          # Authenticated routes
-│   │   ├── (auth)/         # Authentication routes
-│   │   └── layout.tsx      # Root layout
-│   ├── components/         # React components
-│   ├── lib/               # Utility functions
+│   ├── src/
+│   │   ├── app/             # App Router pages
+│   │   │   ├── (app)/      # Authenticated routes (WIP)
+│   │   │   ├── (auth)/     # Authentication routes
+│   │   │   └── layout.tsx  # Root layout
+│   │   ├── components/      # React components
+│   │   ├── lib/            # Utility functions
+│   │   └── types/          # TypeScript definitions
 │   └── package.json
-├── backend/                # FastAPI backend
+├── backend/                 # FastAPI backend
 │   ├── app/
-│   │   ├── core/          # Configuration and dependencies
-│   │   ├── models/        # SQLAlchemy models
-│   │   ├── routers/       # API routes
-│   │   ├── schemas/       # Pydantic schemas
-│   │   ├── database.py    # Database setup
-│   │   └── main.py        # FastAPI app
+│   │   ├── core/           # Configuration and dependencies
+│   │   ├── models/         # SQLAlchemy models
+│   │   ├── routers/        # API routes
+│   │   ├── schemas/        # Pydantic schemas
+│   │   ├── database.py     # Database setup
+│   │   └── main.py         # FastAPI app
+│   ├── alembic/            # Database migrations
 │   └── requirements.txt
 └── README.md
 ```
 
-## API Endpoints
+## 🔌 API Endpoints
 
-### Authentication
+### Authentication (✅ Working)
 - `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
+- `POST /api/auth/login` - User login  
 - `POST /api/auth/logout` - User logout
+- `GET /api/auth/me` - Get current user
 
-### Prompts
-- `GET /api/prompts` - List all prompts
-- `POST /api/prompts` - Create new prompt
-- `GET /api/prompts/{id}` - Get prompt by ID
-- `PUT /api/prompts/{id}` - Update prompt
-- `DELETE /api/prompts/{id}` - Delete prompt
+### Prompts (🚧 In Progress)
+- `GET /api/prompts` - List all prompts (returns empty array)
+- `POST /api/prompts` - Create new prompt (501 Not Implemented)
+- `GET /api/prompts/{id}` - Get prompt by ID (404 Not Found)
+- `PUT /api/prompts/{id}` - Update prompt (Not Implemented)
+- `DELETE /api/prompts/{id}` - Delete prompt (Not Implemented)
 
 ### Health
-- `GET /api/health` - Health check endpoint
+- `GET /api/health` - Health check endpoint (✅ Working)
 
-## Development
+## 🧪 Development
 
 ### Running Tests
 
 ```bash
-# Frontend tests
+# Frontend tests (when implemented)
 cd frontend
 npm test
 
-# Backend tests  
+# Backend tests (when implemented)
 cd backend
 pytest
-```
-
-### Building for Production
-
-```bash
-# Frontend build
-cd frontend
-npm run build
-
-# Backend (no build needed for Python)
 ```
 
 ### Code Quality
@@ -153,30 +195,34 @@ npm run lint
 npx tsc --noEmit
 ```
 
-## Contributing
+## 🤝 Contributing
+
+We welcome contributions! Here's how to get started:
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
+3. Commit your changes using conventional commits
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## License
+### Development Focus Areas
+- Implement prompt CRUD operations
+- Build version control system for prompts
+- Create dashboard and main application UI
+- Add AI model integrations
+- Implement team collaboration features
+
+## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Support
+## 🆘 Support
 
 For support and questions:
-- Open an issue on GitHub
-- Join our Discord community
-- Email: support@promptvault.dev
+- Open an issue on GitHub for bugs or feature requests
+- Check the API documentation at `/api/docs` when backend is running
+- Review the existing codebase for implementation patterns
 
-## Roadmap
+---
 
-- [ ] Prompt diff visualization
-- [ ] Prompt performance analytics
-- [ ] Team collaboration features
-- [ ] Model integration (OpenAI, Anthropic, etc.)
-- [ ] Prompt templates and sharing
-- [ ] CLI tool for local prompt management
+**Note**: This is an active development project. Features marked as "working" have been tested and verified. Features marked "in progress" are partially implemented but may have limitations. Check the GitHub issues for current development status and priorities.
