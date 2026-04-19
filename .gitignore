@@ -1,3 +1,27 @@
-frontend/node_modules\nbackend/venv\n*.db\n.env\n__pycache__\n.next
-frontend/
-.opencode/agents
+# Dependencies
+frontend/node_modules
+backend/venv
+
+# Database
+*.db
+
+# Environment
+.env
+.env.local
+
+# Python cache
+__pycache__/
+*.pyc
+.ruff_cache/
+
+# Next.js
+.next/
+frontend/.next/
+
+# OpenCode
+.opencode/
+
+# Local-only project files (not for repo)
+AGENTS.md
+design-system.md
+week1-prompt.md
