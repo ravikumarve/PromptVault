@@ -8,7 +8,7 @@ from ..models.user import User as UserModel
 from ..schemas.user import UserCreate, UserLogin, Token, User
 from ..core.security import verify_password, get_password_hash, create_access_token
 from ..core.config import settings
-from ..core.deps import get_current_user as get_current_user_dep
+from ..core.deps import get_current_user as get_current_user_dep, get_user_from_expired_token
 
 router = APIRouter()
 security = HTTPBearer()
@@ -63,3 +63,12 @@ async def get_current_user(current_user: UserModel = Depends(get_current_user_de
 async def logout(response: Response):
     response.delete_cookie("access_token")
     return {"message": "Successfully logged out"}
+
+
+@router.post("/refresh", response_model=Token)
+async def refresh_token(
+    current_user: UserModel = Depends(get_user_from_expired_token),
+):
+    """Issue a new access token. Accepts expired tokens to allow refresh."""
+    access_token = create_access_token(data={"sub": current_user.email})
+    return {"access_token": access_token, "token_type": "bearer"}

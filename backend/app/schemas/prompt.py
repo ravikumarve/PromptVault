@@ -1,4 +1,4 @@
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 
@@ -11,6 +11,13 @@ class PromptBase(BaseModel):
 
 class PromptCreate(PromptBase):
     content: str
+
+
+class PromptUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    is_public: Optional[bool] = None
+    content: Optional[str] = None
 
 
 class Prompt(PromptBase):

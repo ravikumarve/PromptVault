@@ -43,7 +43,7 @@ export function useAuth() {
       setLoading(true)
       const result = await api.login(email, password)
       if (result.data?.access_token) {
-        // Token storage is now handled by the API client internally
+        localStorage.setItem('access_token', result.data.access_token)
         await checkAuth()
         return { success: true }
       } else {
@@ -61,6 +61,9 @@ export function useAuth() {
       setLoading(true)
       const result = await api.register(email, password, name)
       if (!result.error) {
+        if (result.data?.access_token) {
+          localStorage.setItem('access_token', result.data.access_token)
+        }
         return { success: true }
       } else {
         return { success: false, error: result.error }

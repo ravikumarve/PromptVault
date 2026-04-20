@@ -46,12 +46,18 @@ class ApiClient {
     this.isRefreshing = true
 
     try {
+      const token = this.getAccessToken()
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
       const response = await fetch(`${this.baseUrl}/api/auth/refresh`, {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
       })
 
       if (response.ok) {
@@ -129,7 +135,7 @@ class ApiClient {
 
   // Auth endpoints
   async register(email: string, password: string, name: string) {
-    return this.request<{ message: string }>('/api/auth/register', {
+    return this.request<{ access_token: string; token_type: string }>('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify({ email, password, name }),
     })
@@ -192,17 +198,17 @@ class ApiClient {
     }>(`/api/prompts/${id}`)
   }
 
-  async createPrompt(title: string, content: string, tags?: string[]) {
-    return this.request<{ id: number; message: string }>('/api/prompts/', {
+  async createPrompt(title: string, content: string, description?: string, isPublic?: boolean) {
+    return this.request<{ id: number; version_count: number; latest_content: string | null }>('/api/prompts/', {
       method: 'POST',
-      body: JSON.stringify({ title, content, tags }),
+      body: JSON.stringify({ title, content, description, is_public: isPublic }),
     })
   }
 
-  async updatePrompt(id: string, title?: string, content?: string, tags?: string[]) {
-    return this.request<{ message: string }>(`/api/prompts/${id}`, {
+  async updatePrompt(id: string, title?: string, content?: string, description?: string, isPublic?: boolean) {
+    return this.request<{ id: number; version_count: number; latest_content: string | null }>(`/api/prompts/${id}`, {
       method: 'PUT',
-      body: JSON.stringify({ title, content, tags }),
+      body: JSON.stringify({ title, content, description, is_public: isPublic }),
     })
   }
 

@@ -29,9 +29,9 @@ export default function RegisterPage() {
 
     const result = await register(email, password, username)
     
-    if (result.success) {
-      window.location.href = '/login?registered=true'
-    } else {
+  if (result.success) {
+    window.location.href = '/dashboard'
+  } else {
       setError(result.error || 'Registration failed')
     }
     
