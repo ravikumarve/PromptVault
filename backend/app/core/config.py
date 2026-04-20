@@ -14,6 +14,15 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
 
+    def model_post_init(self, __context):
+        if self.SECRET_KEY == "your-secret-key-here-change-in-production":
+            import warnings
+            warnings.warn(
+                "⚠️ SECRET_KEY is set to the default placeholder. "
+                "Set a proper SECRET_KEY in .env for production!",
+                stacklevel=2,
+            )
+
 
 @lru_cache()
 def get_settings():

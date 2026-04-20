@@ -13,3 +13,5 @@ class User(Base):
     name = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     is_active = Column(Boolean, default=True)
+    prompts = relationship("Prompt", back_populates="user", lazy="select")
+    tags = relationship("Tag", back_populates="user", lazy="select")

@@ -1,0 +1,90 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Backgrounds */
+  --bg-base:        #09090B;   /* page — true near-black */
+  --bg-surface:     #0F0F12;   /* cards, panels */
+  --bg-elevated:    #18181C;   /* modals, dropdowns */
+  --bg-subtle:      #1F1F26;   /* inputs, code blocks */
+  --bg-hover:       #242429;   /* hover state surfaces */
+
+  /* Borders */
+  --border-default: #27272A;   /* standard border — zinc-800 */
+  --border-strong:  #3F3F46;   /* active, focused — zinc-700 */
+  --border-glow:    rgba(245, 158, 11, 0.25);
+
+  /* Amber Accent */
+  --accent:         #F59E0B;   /* primary amber */
+  --accent-hover:   #FBBF24;   /* hover */
+  --accent-muted:   rgba(245, 158, 11, 0.12);
+  --accent-glow:    0 0 24px rgba(245, 158, 11, 0.2);
+
+  /* Text */
+  --text-primary:   #FAFAFA;   /* zinc-50 */
+  --text-secondary: #A1A1AA;   /* zinc-400 */
+  --text-muted:     #52525B;   /* zinc-600 */
+  --text-accent:    #F59E0B;
+
+  /* Semantic */
+  --success:  #10B981;
+  --error:    #EF4444;
+  --warning:  #F59E0B;
+  --info:     #6366F1;
+
+  /* Shadcn overrides — wire to our tokens */
+  --background:    var(--bg-base);
+  --foreground:    var(--text-primary);
+  --card:          var(--bg-surface);
+  --card-foreground: var(--text-primary);
+  --border:        var(--border-default);
+  --input:         var(--bg-subtle);
+  --primary:       var(--accent);
+  --primary-foreground: #09090B;
+  --muted:         var(--bg-subtle);
+  --muted-foreground: var(--text-secondary);
+  --ring:          var(--accent);
+}
+
+.dark {
+  /* Shadcn dark mode overrides */
+  --background:    var(--bg-base);
+  --foreground:    var(--text-primary);
+  --card:          var(--bg-surface);
+  --card-foreground: var(--text-primary);
+  --border:        var(--border-default);
+  --input:         var(--bg-subtle);
+  --primary:       var(--accent);
+  --primary-foreground: #09090B;
+  --muted:         var(--bg-subtle);
+  --muted-foreground: var(--text-secondary);
+  --ring:          var(--accent);
+}
+
+@layer base {
+  * {
+    border-color: var(--border-default);
+  }
+  body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    background-image: 
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(245,158,11,0.06), transparent);
+  }
+  html {
+    font-family: var(--font-sans);
+  }
+}
+  body {
+    @apply bg-background text-foreground;
+    background-color: var(--bg-base);
+    background-image: 
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(245,158,11,0.06), transparent);
+  }
+  html {
+    @apply font-sans;
+  }
+}

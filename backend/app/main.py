@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .core.config import settings
 from .database import engine, Base
-from .routers import auth, prompts
+from .routers import auth, prompts, versions
 
 app = FastAPI(
     title="PromptVault API",
@@ -33,3 +33,4 @@ async def health_check():
 
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(prompts.router, prefix="/api/prompts", tags=["prompts"])
+app.include_router(versions.router, prefix="/api", tags=["versions"])
