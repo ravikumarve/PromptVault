@@ -3,9 +3,13 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
-import { Plus, BookOpen, History, Tag, AlertCircle, RefreshCw } from 'lucide-react'
+import { Plus, BookOpen, History, Clock, Activity, FileText, TrendingUp, AlertCircle, RefreshCw, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { Prompt } from '@/types'
+import KpiCard from '@/components/ui/kpi-card'
+import Badge from '@/components/ui/badge'
+import EmptyState from '@/components/ui/empty-state'
+import Avatar from '@/components/ui/avatar'
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth()
@@ -24,7 +28,7 @@ export default function DashboardPage() {
       setLoading(true)
       setError(null)
       const response = await api.getPrompts()
-      
+
       if (response.error) {
         setError(response.error)
       } else if (response.data) {
@@ -37,251 +41,237 @@ export default function DashboardPage() {
     }
   }
 
-  const getUniqueTagsCount = () => {
-    // Placeholder - tags would come from a separate API endpoint
-    // For now, we'll assume some prompts have tags
-    const tagCount = prompts.length > 0 ? Math.min(prompts.length, 5) : 0
-    return tagCount
-  }
+  const totalVersions = prompts.reduce((sum, p) => sum + (p.version_count || 0), 0)
 
-  const getTotalVersions = () => {
-    return prompts.reduce((sum, p) => sum + (p.version_count || 0), 0)
-  }
-
-  if (authLoading) {
+  const editedToday = prompts.filter((p) => {
+    const updated = new Date(p.updated_at)
+    const now = new Date()
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--accent)]"></div>
-      </div>
+      updated.getDate() === now.getDate() &&
+      updated.getMonth() === now.getMonth() &&
+      updated.getFullYear() === now.getFullYear()
     )
-  }
+  }).length
+
+  const recentPrompts = [...prompts]
+    .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+    .slice(0, 5)
+
+  const recentActivity = [...prompts]
+    .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+    .slice(0, 5)
 
   return (
-    <div className="space-y-8">
-      {/* Welcome section */}
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-[var(--text-primary)]">
-          Welcome back, {user?.name}!
-        </h1>
-        <p className="text-[var(--text-secondary)] mt-2">
-          Manage your AI prompts and track versions with ease.
-        </p>
-      </div>
-
-      {/* Stats grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-lg p-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[var(--accent-muted)] rounded-md">
-              <BookOpen className="h-5 w-5 text-[var(--accent)]" />
-            </div>
-            <div>
-              <p className="text-sm text-[var(--text-secondary)]">Total Prompts</p>
-              {loading ? (
-                <div className="animate-pulse bg-[var(--bg-subtle)] rounded h-7 w-12"></div>
-              ) : (
-                <p className="text-2xl font-semibold text-[var(--text-primary)] font-mono">
-                  {prompts.length}
-                </p>
-              )}
-            </div>
-          </div>
+    <div className="space-y-6">
+      {/* Page header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-[var(--text-primary)]">
+            Dashboard
+          </h1>
+          <p className="text-sm text-[var(--text-secondary)] mt-1">
+            Welcome back, {user?.name || 'there'}
+          </p>
         </div>
-
-        <div className="bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-lg p-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[var(--accent-muted)] rounded-md">
-              <History className="h-5 w-5 text-[var(--accent)]" />
-            </div>
-            <div>
-              <p className="text-sm text-[var(--text-secondary)]">Total Versions</p>
-              {loading ? (
-                <div className="animate-pulse bg-[var(--bg-subtle)] rounded h-7 w-12"></div>
-              ) : (
-                <p className="text-2xl font-semibold text-[var(--text-primary)] font-mono">
-                  {getTotalVersions()}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-lg p-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[var(--accent-muted)] rounded-md">
-              <Tag className="h-5 w-5 text-[var(--accent)]" />
-            </div>
-            <div>
-              <p className="text-sm text-[var(--text-secondary)]">Unique Tags</p>
-              {loading ? (
-                <div className="animate-pulse bg-[var(--bg-subtle)] rounded h-7 w-12"></div>
-              ) : (
-                <p className="text-2xl font-semibold text-[var(--text-primary)] font-mono">
-                  {getUniqueTagsCount()}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-lg p-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[var(--accent-muted)] rounded-md">
-              <Plus className="h-5 w-5 text-[var(--accent)]" />
-            </div>
-            <div>
-              <p className="text-sm text-[var(--text-secondary)]">Ready to create</p>
-              <p className="text-2xl font-semibold text-[var(--text-primary)] font-mono">
-                —
-              </p>
-            </div>
-          </div>
-        </div>
+        <Link
+          href="/prompts/new"
+          className="btn btn-primary text-sm !py-2 !px-4 gap-2"
+        >
+          <Plus className="h-4 w-4" />
+          New Prompt
+        </Link>
       </div>
 
       {/* Error state */}
       {error && (
-        <div className="bg-[var(--error-bg)] border border-[var(--error-border)] rounded-lg p-6">
+        <div className="bg-[var(--error-bg)] border border-[var(--error-border)] rounded-[var(--radius-card)] p-4">
           <div className="flex items-center gap-3">
-            <AlertCircle className="h-5 w-5 text-[var(--error)]" />
-            <div>
+            <AlertCircle className="h-5 w-5 text-[var(--error)] shrink-0" />
+            <div className="flex-1">
               <p className="text-sm font-medium text-[var(--error)]">Error fetching data</p>
-              <p className="text-sm text-[var(--text-secondary)] mt-1">{error}</p>
+              <p className="text-xs text-[var(--text-secondary)] mt-0.5">{error}</p>
             </div>
             <button
               onClick={fetchPrompts}
-              className="ml-auto flex items-center gap-2 text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors"
+              className="flex items-center gap-1.5 text-xs text-[var(--accent-amber)] hover:text-[var(--accent-hover)] transition-colors"
             >
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className="h-3.5 w-3.5" />
               Retry
             </button>
           </div>
         </div>
       )}
 
-      {/* Loading state */}
-      {loading && !error && (
-        <div className="bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-lg p-12 text-center">
-          <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--accent)] mb-4"></div>
-            <p className="text-[var(--text-secondary)]">Loading your prompts...</p>
-          </div>
-        </div>
-      )}
+      {/* KPI Strip */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <KpiCard
+          value={prompts.length}
+          label="Total Prompts"
+          loading={loading}
+        />
+        <KpiCard
+          value={totalVersions}
+          label="Total Versions"
+          loading={loading}
+        />
+        <KpiCard
+          value={editedToday}
+          label="Edited Today"
+          loading={loading}
+          delta={editedToday > 0 ? 100 : undefined}
+        />
+        <KpiCard
+          value={prompts.length > 0 ? '--' : '--'}
+          label="Success Rate"
+          loading={loading}
+        />
+      </div>
 
-      {/* Empty state */}
-      {!loading && !error && prompts.length === 0 && (
-        <div className="bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-lg p-12 text-center">
-          <div className="mx-auto w-16 h-16 bg-[var(--accent-muted)] rounded-full flex items-center justify-center mb-6">
-            <BookOpen className="h-8 w-8 text-[var(--accent)]" />
-          </div>
-          
-          <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
-            No prompts yet
-          </h2>
-          
-          <p className="text-[var(--text-secondary)] mb-6 max-w-md mx-auto">
-            Get started by creating your first prompt. Track versions, add tags, and manage your AI prompts like code.
-          </p>
-          
-          <Link
-            href="/prompts/new"
-            className="inline-flex items-center gap-2 bg-[var(--accent)] text-[#09090B] font-medium text-sm px-6 py-3 rounded-md hover:bg-[var(--accent-hover)] hover:shadow-[0_0_16px_rgba(245,158,11,0.4)] transition-all duration-150"
-          >
-            <Plus className="h-4 w-4" />
-            Create your first prompt
-          </Link>
-        </div>
-      )}
-
-      {/* Prompts list */}
-      {!loading && !error && prompts.length > 0 && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-[var(--text-primary)]">
-              Your Prompts ({prompts.length})
-            </h3>
-            <Link
-              href="/prompts/new"
-              className="inline-flex items-center gap-2 bg-[var(--accent)] text-[#09090B] font-medium text-sm px-4 py-2 rounded-md hover:bg-[var(--accent-hover)] transition-colors"
-            >
-              <Plus className="h-4 w-4" />
-              New Prompt
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {prompts.slice(0, 6).map((prompt) => (
-              <Link
-                key={prompt.id}
-                href={`/prompts/${prompt.id}`}
-                className="bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-lg p-6 hover:border-[var(--accent)] hover:shadow-lg transition-all duration-200"
-              >
-                <h4 className="font-semibold text-[var(--text-primary)] mb-2 truncate">
-                  {prompt.title}
-                </h4>
-                <p className="text-sm text-[var(--text-secondary)] line-clamp-2 mb-4">
-                  {prompt.description || prompt.latest_content?.slice(0, 100)}...
-                </p>
-                <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
-                  <span>{new Date(prompt.created_at).toLocaleDateString()}</span>
-                  <span className="font-mono">#{prompt.id}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          {prompts.length > 6 && (
-            <div className="text-center">
+      {/* Main content area */}
+      <div className="bento-grid">
+        {/* Recent Prompts - col-span-8 */}
+        <div className="bento-cell col-span-8">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-base font-semibold text-[var(--text-primary)] flex items-center gap-2">
+              <FileText className="h-4 w-4 text-[var(--accent-amber)]" />
+              Recent Prompts
+            </h2>
+            {prompts.length > 0 && (
               <Link
                 href="/prompts"
-                className="text-[var(--accent)] hover:text-[var(--accent-hover)] text-sm font-medium"
+                className="text-xs text-[var(--accent-amber)] hover:text-[var(--accent-hover)] flex items-center gap-1 transition-colors"
               >
-                View all {prompts.length} prompts →
+                View all <ChevronRight className="h-3 w-3" />
               </Link>
+            )}
+          </div>
+
+          {loading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="h-12 bg-[var(--border-dim)] rounded-[var(--radius-btn)]" />
+                </div>
+              ))}
+            </div>
+          ) : recentPrompts.length === 0 ? (
+            <EmptyState
+              icon={<BookOpen className="h-6 w-6" />}
+              title="No prompts yet"
+              description="Create your first prompt to start tracking versions and see it here."
+              action={
+                <Link
+                  href="/prompts/new"
+                  className="btn btn-primary text-sm !py-2 !px-4 gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Create Prompt
+                </Link>
+              }
+            />
+          ) : (
+            <div className="space-y-2">
+              {recentPrompts.map((prompt) => (
+                <Link
+                  key={prompt.id}
+                  href={`/prompts/${prompt.id}`}
+                  className="flex items-center justify-between py-3 px-3 rounded-[var(--radius-btn)] hover:bg-[var(--surface-panel)] transition-colors group"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-7 h-7 rounded-[var(--radius-btn)] bg-[var(--accent-amber-dim)] flex items-center justify-center shrink-0">
+                      <FileText className="h-3.5 w-3.5 text-[var(--accent-amber)]" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-[var(--accent-amber)] transition-colors">
+                        {prompt.title}
+                      </p>
+                      <p className="text-[11px] text-[var(--text-tertiary)] font-mono mt-0.5">
+                        {new Date(prompt.updated_at).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Badge text={`v${prompt.version_count}`} variant="amber" />
+                    <ChevronRight className="h-3.5 w-3.5 text-[var(--text-tertiary)] opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                </Link>
+              ))}
             </div>
           )}
         </div>
-      )}
 
-      {/* Recent activity */}
-      <div className="bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">
-          Recent Activity
-        </h3>
-        
-        {loading ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse">
-                <div className="h-4 bg-[var(--bg-subtle)] rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-[var(--bg-subtle)] rounded w-1/2"></div>
-              </div>
-            ))}
-          </div>
-        ) : prompts.length > 0 ? (
-          <div className="space-y-4">
-            {prompts.slice(0, 3).map((prompt) => (
-              <div key={prompt.id} className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-[var(--accent)] rounded-full"></div>
-                <div className="flex-1">
-                  <p className="text-sm text-[var(--text-primary)]">
-                    Created <strong>{prompt.title}</strong>
-                  </p>
-                  <p className="text-xs text-[var(--text-secondary)]">
-                    {new Date(prompt.created_at).toLocaleString()}
-                  </p>
+        {/* Activity Feed - col-span-4 */}
+        <div className="bento-cell col-span-4">
+          <h2 className="text-base font-semibold text-[var(--text-primary)] mb-5 flex items-center gap-2">
+            <Activity className="h-4 w-4 text-[var(--accent-amber)]" />
+            Activity
+          </h2>
+
+          {loading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="animate-pulse flex gap-3">
+                  <div className="w-2 h-2 bg-[var(--border-dim)] rounded-full mt-1" />
+                  <div className="flex-1">
+                    <div className="h-3 bg-[var(--border-dim)] rounded w-3/4 mb-1" />
+                    <div className="h-2 bg-[var(--border-dim)] rounded w-1/2" />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          ) : recentActivity.length === 0 ? (
+            <EmptyState
+              icon={<Clock className="h-6 w-6" />}
+              title="No activity yet"
+              description="Your recent changes will appear here."
+            />
+          ) : (
+            <div className="space-y-4">
+              {recentActivity.map((prompt) => (
+                <Link
+                  key={prompt.id}
+                  href={`/prompts/${prompt.id}`}
+                  className="flex items-start gap-3 group"
+                >
+                  <div className="w-2 h-2 bg-[var(--accent-amber)] rounded-full mt-1.5 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-sm text-[var(--text-primary)] group-hover:text-[var(--accent-amber)] transition-colors">
+                      <span className="font-medium">{prompt.title}</span>
+                    </p>
+                    <p className="text-[11px] text-[var(--text-tertiary)] font-mono mt-0.5">
+                      {new Date(prompt.updated_at).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Version Activity Chart Placeholder - col-span-12 */}
+        <div className="bento-cell col-span-12">
+          <h2 className="text-base font-semibold text-[var(--text-primary)] mb-5 flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-[var(--accent-amber)]" />
+            Version Activity
+          </h2>
+          <div className="h-48 rounded-[var(--radius-card)] bg-[var(--surface-panel)] border border-[var(--border-dim)] flex items-center justify-center">
+            <div className="text-center">
+              <TrendingUp className="h-8 w-8 text-[var(--text-tertiary)] mx-auto mb-2" />
+              <p className="text-sm text-[var(--text-tertiary)]">Version activity chart coming soon</p>
+              <p className="text-xs text-[var(--text-tertiary)] mt-1">Track version creation over time</p>
+            </div>
           </div>
-        ) : (
-          <div className="text-center py-8">
-            <p className="text-[var(--text-secondary)]">
-              No recent activity yet. Create your first prompt to see activity here.
-            </p>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   )
