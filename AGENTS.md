@@ -1,5 +1,19 @@
 # 🏛️ PromptVault — Agent Integration Guide
 
+### [2026-06-16 12:00] - Phase 4 Settings, Activity, Auth Pages
+- **State**: Success — Pushed to main (827e641)
+- **MCP Data Used**: explore (auth pages, settings/activity routes)
+- **Agents Deployed**: @codebase (direct execution)
+- **Architectural Decision**: Auth layout uses ParticleWave React component wrapping the landing page's 3D canvas animation. Auth redesign uses `card-elevated` (backdrop blur) and `router.push()` for navigation. Settings has profile/API keys/danger zone sections. Activity feed derives events from prompt `created_at`/`updated_at` timestamps.
+- **Deliverables**:
+  - `components/ui/particle-wave.tsx` — 3D amber particle wave canvas (1800 particles, mouse tracking)
+  - `(auth)/layout.tsx` — auth shell with particle wave + centered card
+  - `(auth)/login/page.tsx` — redesigned with new tokens, elevated card, router.push
+  - `(auth)/register/page.tsx` — redesigned with new tokens, elevated card, router.push
+  - `(app)/settings/page.tsx` — profile info, API keys section, danger zone
+  - `(app)/activity/page.tsx` — grouped timeline of created/updated events from real data
+- **Next Turn Directive**: Global search (⌘K palette), responsive polish, final testing
+
 ### [2026-06-16 11:00] - Phase 3 Prompt Editor + Diff Viewer
 - **State**: Success — Pushed to main (d680622)
 - **MCP Data Used**: explore (backend diff router, existing new prompt page)
