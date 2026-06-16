@@ -9,11 +9,29 @@ export interface User {
 
 // Prompt types
 export interface PromptVersion {
-  id: string
+  id: number
+  prompt_id: number
+  version_number: number
   content: string
-  version_hash: string
+  message: string | null
+  model_tested: string | null
   created_at: string
-  author_id?: string
+}
+
+export interface DiffResponse {
+  source_version_id: number
+  source_version_number: number
+  target_version_id: number
+  target_version_number: number
+  diff: string
+}
+
+export interface CompareResponse {
+  versions: {
+    source: PromptVersion
+    target: PromptVersion
+  }
+  diff: string
 }
 
 export interface Prompt {

@@ -218,6 +218,83 @@ class ApiClient {
     })
   }
 
+  // Version endpoints
+  async getVersions(promptId: string | number) {
+    return this.request<{
+      id: number
+      prompt_id: number
+      version_number: number
+      content: string
+      message: string | null
+      model_tested: string | null
+      created_at: string
+    }[]>(`/api/prompts/${promptId}/versions`)
+  }
+
+  async getVersion(promptId: string | number, versionId: string | number) {
+    return this.request<{
+      id: number
+      prompt_id: number
+      version_number: number
+      content: string
+      message: string | null
+      model_tested: string | null
+      created_at: string
+    }>(`/api/prompts/${promptId}/versions/${versionId}`)
+  }
+
+  async getLatestVersion(promptId: string | number) {
+    return this.request<{
+      id: number
+      prompt_id: number
+      version_number: number
+      content: string
+      message: string | null
+      model_tested: string | null
+      created_at: string
+    }>(`/api/prompts/${promptId}/versions/latest`)
+  }
+
+  async getDiff(promptId: string | number, versionId: string | number, targetVersionId?: string | number) {
+    let url = `/api/prompts/${promptId}/versions/${versionId}/diff`
+    if (targetVersionId !== undefined) {
+      url += `?target_version_id=${targetVersionId}`
+    }
+    return this.request<{
+      source_version_id: number
+      source_version_number: number
+      target_version_id: number
+      target_version_number: number
+      diff: string
+    }>(url)
+  }
+
+  async compareVersions(promptId: string | number, sourceVersionId: string | number, targetVersionId: string | number) {
+    return this.request<{
+      versions: {
+        source: {
+          id: number
+          prompt_id: number
+          version_number: number
+          content: string
+          message: string | null
+          model_tested: string | null
+          created_at: string
+        }
+        target: {
+          id: number
+          prompt_id: number
+          version_number: number
+          content: string
+          message: string | null
+          model_tested: string | null
+          created_at: string
+        }
+      }
+      diff: string
+    }>(`/api/prompts/${promptId}/versions/${sourceVersionId}/compare/${targetVersionId}`)
+  }
+
   // Health check
   async healthCheck() {
     return this.request<{ status: string; timestamp: string }>('/api/health')
