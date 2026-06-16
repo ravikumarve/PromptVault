@@ -1,5 +1,18 @@
 # 🏛️ PromptVault — Agent Integration Guide
 
+### [2026-06-16 10:15] - Phase 2 Prompt Detail + Version Timeline
+- **State**: Success — Pushed to main (9a3a6f8)
+- **MCP Data Used**: explore (backend version router, API shapes), read_session
+- **Agents Deployed**: @codebase (direct execution)
+- **Architectural Decision**: Fixed `PromptVersion` type mismatch (version_hash → version_number/message/model_tested). Added 6 version API methods to `api.ts`. Detail page uses 70/30 CSS grid split with version selector tabs and CodeBlock for content display. VersionTimeline uses amber dot connector with View/Diff actions. Back navigation via `Back to Prompts` link.
+- **Deliverables**:
+  - `types/index.ts` — fixed PromptVersion + added DiffResponse/CompareResponse interfaces
+  - `lib/api.ts` — added getVersions, getVersion, getLatestVersion, getDiff, compareVersions
+  - `components/ui/code-block.tsx` — mono display with line numbers and optional header
+  - `components/prompts/version-timeline.tsx` — vertical timeline with amber dots, version badges, View/Diff actions
+  - `prompts/[id]/page.tsx` — full detail page with 70/30 split, version selector, metadata header
+- **Next Turn Directive**: Phase 3 — Prompt Editor (create/edit with live diff preview), Diff Viewer hero component
+
 ### [2026-06-16 09:00] - Phase 1 Dashboard Implementation (Core Shell + Library)
 - **State**: Success — Pushed to main (5aacb10)
 - **MCP Data Used**: code_tree (AST analysis), read_session (session resume)
