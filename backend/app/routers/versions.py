@@ -113,6 +113,34 @@ async def create_version(
     return db_version
 
 
+@router.get("/prompts/{prompt_id}/versions/latest", response_model=PromptVersionSchema)
+async def get_latest_version(
+    prompt_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Get the latest version of a prompt.
+    """
+    # Verify prompt ownership
+    verify_prompt_ownership(prompt_id, current_user, db)
+
+    version = (
+        db.query(PromptVersion)
+        .filter(PromptVersion.prompt_id == prompt_id)
+        .order_by(PromptVersion.version_number.desc())
+        .first()
+    )
+
+    if not version:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No versions found for prompt {prompt_id}",
+        )
+
+    return version
+
+
 @router.get(
     "/prompts/{prompt_id}/versions/{version_id}", response_model=PromptVersionSchema
 )
@@ -138,34 +166,6 @@ async def get_version(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Version with ID {version_id} not found for prompt {prompt_id}",
-        )
-
-    return version
-
-
-@router.get("/prompts/{prompt_id}/versions/latest", response_model=PromptVersionSchema)
-async def get_latest_version(
-    prompt_id: int,
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    """
-    Get the latest version of a prompt.
-    """
-    # Verify prompt ownership
-    verify_prompt_ownership(prompt_id, current_user, db)
-
-    version = (
-        db.query(PromptVersion)
-        .filter(PromptVersion.prompt_id == prompt_id)
-        .order_by(PromptVersion.version_number.desc())
-        .first()
-    )
-
-    if not version:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"No versions found for prompt {prompt_id}",
         )
 
     return version

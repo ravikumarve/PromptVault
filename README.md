@@ -63,34 +63,64 @@ npm run dev                      # ← frontend :3000
 
 ## 📖 API Reference
 
-| Endpoint | Method | Status |
+### Auth
+| Method | Endpoint | Description |
 |---|---|---|
-| `/api/auth/register` | POST | ✅ Working |
-| `/api/auth/login` | POST | ✅ Working |
-| `/api/auth/logout` | POST | ✅ Working |
-| `/api/auth/me` | GET | ✅ Working |
-| `/api/prompts` | GET | 🚧 Returns empty |
-| `/api/prompts` | POST | 🚧 501 Not Implemented |
-| `/api/health` | GET | ✅ Working |
+| POST | `/api/auth/register` | Register a new user |
+| POST | `/api/auth/login` | Login, returns JWT |
+| GET | `/api/auth/me` | Current user profile |
+| POST | `/api/auth/logout` | Clear session |
+| POST | `/api/auth/refresh` | Refresh expired token |
+
+### Prompts
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/prompts/` | List user's prompts (with version count + latest content) |
+| POST | `/api/prompts/` | Create prompt + initial version |
+| GET | `/api/prompts/{id}` | Get prompt details |
+| PUT | `/api/prompts/{id}` | Update prompt (auto-versions on content change) |
+| DELETE | `/api/prompts/{id}` | Delete prompt + all versions |
+
+### Versions
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/prompts/{id}/versions` | List all versions |
+| POST | `/api/prompts/{id}/versions` | Create new version (auto-numbered) |
+| GET | `/api/prompts/{id}/versions/latest` | Get latest version |
+| GET | `/api/prompts/{id}/versions/{vid}` | Get specific version |
+| GET | `/api/prompts/{id}/versions/{vid}/diff` | Unified diff (optional `target_version_id`) |
+| GET | `/api/prompts/{id}/versions/{vid}/compare/{target}` | Compare two versions |
 
 Full interactive docs: `http://localhost:8000/api/docs`
+
+## 🧪 Testing
+
+```bash
+cd backend
+PYTHONPATH=. python3 -m pytest tests/ -v
+```
+
+**41 tests** covering auth, prompt CRUD, versioning, ownership isolation, and diff/compare. Uses an in-memory SQLite database — no setup required.
 
 ## 🗂️ Project Structure
 
 ```
 promptvault/
-├── frontend/          # Next.js 16 (App Router)
+├── frontend/               # Next.js 16 (App Router)
 │   └── src/
-│       ├── app/       # (auth)/ and (app)/ route groups
-│       ├── components/
-│       └── lib/
-├── backend/           # FastAPI
-│   └── app/
-│       ├── core/      # Config, dependencies
-│       ├── models/    # SQLAlchemy models
-│       ├── routers/   # API routes
-│       └── schemas/   # Pydantic schemas
-└── .env.example
+│       ├── app/            # (auth)/ and (app)/ route groups
+│       ├── components/     # Sidebar, Topbar, UI primitives
+│       ├── lib/            # ApiClient, auth hooks, utils
+│       └── types/          # TypeScript interfaces
+├── backend/                # FastAPI
+│   ├── app/
+│   │   ├── core/           # Config, security, dependencies
+│   │   ├── models/         # SQLAlchemy models (User, Prompt, PromptVersion, Tag)
+│   │   ├── routers/        # auth, prompts, versions
+│   │   └── schemas/        # Pydantic validation schemas
+│   └── tests/              # 41 pytest tests (in-memory DB)
+├── .env.example
+└── README.md
 ```
 
 ## 🤝 Contributing

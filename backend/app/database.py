@@ -8,6 +8,10 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
+# Import all models so SQLAlchemy registers them before mapper configuration.
+# This ensures string-based relationships (e.g., "Tag") resolve correctly.
+from . import models  # noqa: E402, F401
+
 
 def get_db():
     db = SessionLocal()
