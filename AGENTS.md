@@ -1,5 +1,17 @@
 # 🏛️ PromptVault — Agent Integration Guide
 
+### [2026-06-16 11:00] - Phase 3 Prompt Editor + Diff Viewer
+- **State**: Success — Pushed to main (d680622)
+- **MCP Data Used**: explore (backend diff router, existing new prompt page)
+- **Agents Deployed**: @codebase (direct execution)
+- **Architectural Decision**: DiffViewer parses unified diff output into add/remove/context/chunk/header line types. Live diff in edit page uses `computeSimpleDiff` (client-side line comparison). Edit page has `compareVersions` API call for real diff compute. Create page uses CodeBlock preview (no diff for new prompts). Split layouts (2-col grid) for all editor pages.
+- **Deliverables**:
+  - `components/versions/diff-viewer.tsx` — hero component parsing unified diff with line coloring (add/remove/context/chunk/header)
+  - `prompts/[id]/diff/page.tsx` — full diff page with From/To version selectors, swap button, metadata header
+  - `prompts/[id]/edit/page.tsx` — split layout: form left (title/description/content/commit message), live diff preview right
+  - `prompts/new/page.tsx` — updated to split layout with live CodeBlock preview panel
+- **Next Turn Directive**: Phase 4 — Settings page, Activity feed, Auth page redesign, Global search (⌘K), Responsive polish
+
 ### [2026-06-16 10:15] - Phase 2 Prompt Detail + Version Timeline
 - **State**: Success — Pushed to main (9a3a6f8)
 - **MCP Data Used**: explore (backend version router, API shapes), read_session
